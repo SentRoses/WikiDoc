@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="fr"><head><meta charSet="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta http-equiv="X-UA-Compatible" content="ie=edge"/><title>Angular 2 - Comprendre Angular de zéro - WikiDoc</title><link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/dracula.min.css"/><link rel="stylesheet" href="https://boxydev.github.io/WikiDoc/css/main.css"/></head><body><nav><div class="wrap"><a class="nav-home" href="https://boxydev.github.io/WikiDoc/index.html"><img class="nav-logo" src="https://www.boxydev.com/img/logo.png" alt="WikiDoc"/>  WikiDoc</a><div class="nav-list"><ul class="nav-left"><li><a class="" href="https://boxydev.github.io/WikiDoc/index.html">Accueil</a></li><li><a class="" href="https://boxydev.github.io/WikiDoc/about.html">A propos</a></li></ul><ul class="nav-right"><li><a target="_blank" href="https://github.com/Boxydev/WikiDoc">GitHub</a></li></ul></div></div></nav><section class="wrap page-content"><a class="edit-page-link" href="https://github.com/boxydev/WikiDoc/tree/master/src/data/pages/angular2/comprendre-angular-de-zero.md" target="_blank">Modifier sur GitHub</a><div><h1 id="comprendre-angular-de-z-ro">Comprendre Angular de zéro</h1>
+<p>On peut créer une application Angular en partant de rien. Cela permet de bien comprendre les entrailles du framework. Pour commencer, on va installer TypeScript.</p>
+<pre><code class="lang-bash">npm install -g typescript
+</code></pre>
+<p>On va créer un dossier <code>angularfs/</code> et se mettre dedans. On va générer un fichier tsconfig.json avec des options pour la compilation TypeScript. On précise donc qu&#39;on veut les sourcemaps (debug), un code en es5 et les décorateurs.</p>
+<pre><code class="lang-bash">tsc --init --target es5 --sourceMap --experimentalDecorators --emitDecoratorMetadata
+</code></pre>
+<p>On peut créer un package.json pour notre application.</p>
+<pre><code class="lang-bash">npm init
+</code></pre>
+<p>On va enfin installer Angular ainsi que toutes ses dépendances.</p>
+<pre><code class="lang-bash">npm install --save @angular/core @angular/compiler @angular/common @angular/platform-browser @angular/platform-browser-dynamic rxjs reflect-metadata zone.js
+</code></pre>
+<p>Maintenant, on peut créer un app.component.ts et lancer <code>tsc --watch</code></p>
+<pre><code class="lang-js">import { Component } from &#39;@angular/core&#39;;
+
+@Component({
+  selector: &#39;app&#39;
+})
+export class AppComponent {
+
+}
+</code></pre>
+<p>On va maintenant créer un module Angular racine pour notre application. Créons le fichier <code>app.module.ts</code>.</p>
+<pre><code class="lang-js">import { NgModule } from &#39;@angular/core&#39;;
+import { BrowserModule } from &#39;@angular/platform-browser&#39;;
+import { AppComponent } from &#39;./app.component&#39;;
+
+@NgModule({
+  imports: [BrowserModule],
+  declarations: [AppComponent],
+  bootstrap: [AppComponent]
+})
+export class AppModule {
+
+}
+</code></pre>
+<p>Ici, on importe le décorateur NgModule, on importe aussi le BrowserModule car nous créons ici une application web. On déclare notre composant App et bien sûr on bootstrap l&#39;application dessus.</p>
+<p>Maintenant, on va créer un fichier <code>main.ts</code></p>
+<pre><code class="lang-js">import { platformBrowserDynamic } from &#39;@angular/platform-browser-dynamic&#39;;
+import { AppModule } from &#39;./app.module&#39;;
+
+platformBrowserDynamic().bootstrapModule(AppModule);
+</code></pre>
+<p>Ensuite, on va pouvoir créer le fichier index.html. Mais avant, on va devoir installer systemjs car les navigateurs ES5 ne supportent pas la notion de modules.</p>
+<pre><code class="lang-bash">npm i -D systemjs
+</code></pre>
+<pre><code class="lang-html">&lt;html&gt;
+
+&lt;head&gt;
+  &lt;script src=&quot;node_modules/zone.js/dist/zone.js&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;node_modules/reflect-metadata/Reflect.js&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;node_modules/systemjs/dist/system.js&quot;&gt;&lt;/script&gt;
+  &lt;script&gt;
+    System.config({
+      // the app will need the following dependencies
+      map: {
+        &#39;@angular/core&#39;: &#39;node_modules/@angular/core/bundles/core.umd.js&#39;,
+        &#39;@angular/common&#39;: &#39;node_modules/@angular/common/bundles/common.umd.js&#39;,
+        &#39;@angular/compiler&#39;: &#39;node_modules/@angular/compiler/bundles/compiler.umd.js&#39;,
+        &#39;@angular/platform-browser&#39;: &#39;node_modules/@angular/platform-browser/bundles/platform-browser.umd.js&#39;,
+        &#39;@angular/platform-browser-dynamic&#39;: &#39;node_modules/@angular/platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js&#39;,
+        &#39;rxjs&#39;: &#39;node_modules/rxjs&#39;
+      },
+      packages: {
+        // we want to import our modules without writing &#39;.js&#39; at the end
+        // we declare them as packages and SystemJS will add the extension for us
+        &#39;.&#39;: {}
+      }
+    });
+    // and to finish, let&#39;s boot the app!
+    System.import(&#39;main&#39;);
+  &lt;/script&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+  &lt;app&gt;
+    Loading...
+  &lt;/app&gt;
+&lt;/body&gt;
+
+&lt;/html&gt;
+</code></pre>
+<p>On peut installer http-server via npm pour tester le rendu très rapidement.</p>
+<pre><code>npm i -g http-server
+http-server -p 1234
+</code></pre><p>Cette partie nous permet de comprendre comment est construit Angular 2. Pour démarrer un vrai projet, il vaut mieux démarrer avec <a href="recuperer-angular-2-avec-la-cli.html">Angular CLI</a>.</p>
+</div></section><footer><div class="wrap">Copyright © 2018 Boxydev Inc.</div></footer><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script src="https://boxydev.github.io/WikiDoc/js/app.js"></script></body></html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang="fr"><head><meta charSet="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta http-equiv="X-UA-Compatible" content="ie=edge"/><title>Angular 2 - Le composant de notre application Angular 2 - WikiDoc</title><link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/dracula.min.css"/><link rel="stylesheet" href="https://boxydev.github.io/WikiDoc/css/main.css"/></head><body><nav><div class="wrap"><a class="nav-home" href="https://boxydev.github.io/WikiDoc/index.html"><img class="nav-logo" src="https://www.boxydev.com/img/logo.png" alt="WikiDoc"/>  WikiDoc</a><div class="nav-list"><ul class="nav-left"><li><a class="" href="https://boxydev.github.io/WikiDoc/index.html">Accueil</a></li><li><a class="" href="https://boxydev.github.io/WikiDoc/about.html">A propos</a></li></ul><ul class="nav-right"><li><a target="_blank" href="https://github.com/Boxydev/WikiDoc">GitHub</a></li></ul></div></div></nav><section class="wrap page-content"><a class="edit-page-link" href="https://github.com/boxydev/WikiDoc/tree/master/src/data/pages/angular2/le-composant-de-notre-application-angular-2.md" target="_blank">Modifier sur GitHub</a><div><h1 id="le-composant-de-notre-application-angular-2">Le composant de notre application Angular 2</h1>
+<p>On peut commencer à coder très rapidement en ouvrant le fichier <code>src/app/app.component.ts</code>. Essayons d&#39;écrire ce code et regardons le résultat.</p>
+<pre><code class="lang-js">import { Component } from &#39;@angular/core&#39;;
+
+@Component({
+  selector: &#39;my-app&#39;,
+  template: `&lt;h1&gt;{{title}}&lt;/h1&gt;&lt;h2&gt;{{name}}&lt;/h2&gt;`,
+})
+export class AppComponent {
+  title = &#39;Mon super site avec Angular 2&#39;;
+  name = &#39;4 fromages&#39;;
+}
+</code></pre>
+<h2 id="ranger-dans-une-classe">Ranger dans une classe</h2>
+<p>Je peux créer une classe Pizza qui me permettra de stocker plus d&#39;informations qu&#39;une simple String ! Une classe n&#39;est rien d&#39;autre qu&#39;un simple objet JavaScript !</p>
+<p>On en profite également pour formater notre code sur plusieurs lignes afin qu&#39;il soit plus lisible.</p>
+<pre><code class="lang-js">import { Component } from &#39;@angular/core&#39;;
+
+export class Pizza {
+  id: number;
+  name: string;
+  price: number;
+}
+
+@Component({
+  selector: &#39;my-app&#39;,
+  template: `
+    &lt;h1&gt;{{title}}&lt;/h1&gt;
+    &lt;h2&gt;{{pizza.name}}&lt;/h2&gt;
+    &lt;div&gt;&lt;label&gt;id: &lt;/label&gt;{{pizza.id}}&lt;/div&gt;
+    &lt;div&gt;&lt;label&gt;name: &lt;/label&gt;{{pizza.name}}&lt;/div&gt;
+    &lt;div&gt;&lt;label&gt;price: &lt;/label&gt;{{pizza.price}}&lt;/div&gt;
+  `,
+})
+export class AppComponent {
+  title = &#39;Mon super site avec Angular 2&#39;;
+  pizza: Pizza = {
+    id: 1,
+    name: &#39;Reine&#39;,
+    price: 12
+  }
+}
+</code></pre>
+<h2 id="le-module-de-formulaire">Le module de formulaire</h2>
+<p>Ajoutons tout de suite un <code>&lt;input&gt;</code> nous permettant de modifier le nom de la pizza. <code>[(ngModel)]</code> nous permet de lier la valeur de pizza.name à l&#39;input.</p>
+<pre><code class="lang-html">&lt;div&gt;
+  &lt;label&gt;name: &lt;/label&gt;
+  &lt;input [(ngModel)]=&quot;pizza.name&quot; placeholder=&quot;name&quot;&gt;
+&lt;/div&gt;
+</code></pre>
+<p>Et là, c&#39;est le drame. On se retouve avec un site qui ne fonctionne plus. Si on observe la console du navigateur, on remarque cette erreur <code>Can&#39;t bind to &#39;ngModel&#39; since it isn&#39;t a known property of &#39;input&#39;</code>.</p>
+<p>En fait, c&#39;est tout à fait normal. La gestion des formulaires sous Angular 2 fonctionne grâce au module FormsModule qu&#39;il faut activer.</p>
+<p>Pour importer le module, il faut éditer le fichier <code>app.module.ts</code> et importer le FormsModule à partir de la bibliothéque <code>@angular/forms</code>. Le fichier doit maintenant ressembler à ça.</p>
+<pre><code class="lang-js">import { NgModule }      from &#39;@angular/core&#39;;
+import { BrowserModule } from &#39;@angular/platform-browser&#39;;
+import { FormsModule }   from &#39;@angular/forms&#39;;
+
+import { AppComponent }  from &#39;./app.component&#39;;
+
+@NgModule({
+  imports: [
+    BrowserModule,
+    FormsModule
+  ],
+  declarations: [ AppComponent ],
+  bootstrap:    [ AppComponent ]
+})
+export class AppModule { }
+</code></pre>
+<p>Maintenant, cela devrait fonctionner. Essayez de changer le contenu de l&#39;input.</p>
+<p><a href="../angular2">Retour au sommaire Angular 2</a>.</p>
+</div></section><footer><div class="wrap">Copyright © 2018 Boxydev Inc.</div></footer><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script src="https://boxydev.github.io/WikiDoc/js/app.js"></script></body></html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html><html lang="fr"><head><meta charSet="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta http-equiv="X-UA-Compatible" content="ie=edge"/><title>Angular 2 - Le service HTTP d&#x27;Angular 2 - WikiDoc</title><link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/dracula.min.css"/><link rel="stylesheet" href="https://boxydev.github.io/WikiDoc/css/main.css"/></head><body><nav><div class="wrap"><a class="nav-home" href="https://boxydev.github.io/WikiDoc/index.html"><img class="nav-logo" src="https://www.boxydev.com/img/logo.png" alt="WikiDoc"/>  WikiDoc</a><div class="nav-list"><ul class="nav-left"><li><a class="" href="https://boxydev.github.io/WikiDoc/index.html">Accueil</a></li><li><a class="" href="https://boxydev.github.io/WikiDoc/about.html">A propos</a></li></ul><ul class="nav-right"><li><a target="_blank" href="https://github.com/Boxydev/WikiDoc">GitHub</a></li></ul></div></div></nav><section class="wrap page-content"><a class="edit-page-link" href="https://github.com/boxydev/WikiDoc/tree/master/src/data/pages/angular2/le-service-http-d-angular-2.md" target="_blank">Modifier sur GitHub</a><div><h1 id="le-service-http-d-angular-2">Le service HTTP d&#39;Angular 2</h1>
+<p>Il existe un module nous permettant de gérer plus facilement les requêtes Ajax et surtout la connextion à une API. On va activer le HttpModule.</p>
+<pre><code class="lang-js">import { NgModule }      from &#39;@angular/core&#39;;
+import { BrowserModule } from &#39;@angular/platform-browser&#39;;
+import { FormsModule }   from &#39;@angular/forms&#39;;
+import { HttpModule }    from &#39;@angular/http&#39;;
+
+import { AppComponent }  from &#39;./app.component&#39;;
+import { FrontComponent }  from &#39;./front.component&#39;;
+import { PizzasComponent } from &#39;./pizzas.component&#39;;
+import { PizzaComponent } from &#39;./pizza.component&#39;;
+
+import { PizzaService } from &#39;./services/pizza.service&#39;;
+
+import { AppRoutingModule } from &#39;./modules/app-routing.module&#39;;
+
+@NgModule({
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpModule,
+    AppRoutingModule
+  ],
+  declarations: [
+    AppComponent,
+    FrontComponent,
+    PizzasComponent,
+    PizzaComponent
+  ],
+  providers: [PizzaService],
+  bootstrap:    [ AppComponent ]
+})
+export class AppModule { }
+</code></pre>
+<h2 id="une-fausse-api-pour-le-d-veloppement">Une fausse API pour le développement</h2>
+<p>Durant le développement de notre application, nous n&#39;avons pas forcément d&#39;API. Il peut être intéressant de la simuler grâce à <a target="_blank" href="https://github.com/angular/in-memory-web-api">Angular in-memory-web-api</a>. Attention, cet outil doit être utilisé uniquement en phase de développement.</p>
+<p>On ajoute donc les imports nécessaire dans notre app.module.ts.</p>
+<pre><code class="lang-js">import { NgModule }      from &#39;@angular/core&#39;;
+import { BrowserModule } from &#39;@angular/platform-browser&#39;;
+import { FormsModule }   from &#39;@angular/forms&#39;;
+import { HttpModule }    from &#39;@angular/http&#39;;
+
+import { InMemoryWebApiModule } from &#39;angular-in-memory-web-api&#39;;
+import { BoxydevFakeApi }  from &#39;./services/boxydevfakeapi.service&#39;;
+
+import { AppComponent }  from &#39;./app.component&#39;;
+import { FrontComponent }  from &#39;./front.component&#39;;
+import { PizzasComponent } from &#39;./pizzas.component&#39;;
+import { PizzaComponent } from &#39;./pizza.component&#39;;
+
+import { PizzaService } from &#39;./services/pizza.service&#39;;
+
+import { AppRoutingModule } from &#39;./modules/app-routing.module&#39;;
+
+@NgModule({
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpModule,
+    InMemoryWebApiModule.forRoot(BoxydevFakeApi),
+    AppRoutingModule
+  ],
+  declarations: [
+    AppComponent,
+    FrontComponent,
+    PizzasComponent,
+    PizzaComponent
+  ],
+  providers: [PizzaService],
+  bootstrap:    [ AppComponent ]
+})
+export class AppModule { }
+</code></pre>
+<p>On va bien entendu créer le fichier boxydevfakeapi.service.ts dans app/service.</p>
+<pre><code class="lang-js">import { InMemoryDbService } from &#39;angular-in-memory-web-api&#39;;
+import { Pizza } from &#39;../models/pizza.model&#39;;
+
+export class BoxydevFakeApi implements InMemoryDbService {
+  createDb() {
+    let pizzas : Pizza[] = [
+      { id: 1, name: &#39;Reine&#39;, price: 12 },
+      { id: 2, name: &#39;4 fromages&#39;, price: 13 },
+      { id: 3, name: &#39;Orientale&#39;, price: 11 },
+      { id: 4, name: &#39;Cannibale&#39;, price: 9 }
+    ];
+    return {pizzas};
+  }
+}
+</code></pre>
+<h2 id="notre-api-pizza">Notre API Pizza</h2>
+<p>On peut maintenant adapter notre service pour qu&#39;il aille chercher les informations directement dans la fausse API. On importe les classes nécessaires et on injecte le composant Http.</p>
+<pre><code class="lang-js">import { Injectable } from &#39;@angular/core&#39;;
+import { Http } from &#39;@angular/http&#39;;
+
+import &#39;rxjs/add/operator/toPromise&#39;;
+
+import { Pizza } from &#39;../models/pizza.model&#39;;
+import { PIZZAS } from &#39;../mocks/pizza.mock&#39;;
+
+@Injectable()
+export class PizzaService {
+  constructor(private http: Http) { }
+  // ...
+}
+</code></pre>
+<p>Vous vous souvenez de la méthode getPizzas qui retourne une promesse ? On va devoir la modifier. Elle va ressembler à ça.</p>
+<pre><code class="lang-js">getPizzas(): Promise&lt;Pizza[]&gt; {
+  return this.http.get(&#39;api/pizzas&#39;)
+             .toPromise()
+             .then(response =&gt; response.json().data as Pizza[])
+             .catch(error =&gt; {
+               console.error(error);
+               Promise.reject(error);
+             });
+}
+</code></pre>
+<p>La méthode toPromise est faculative dans un cas réel. De base, la méthode get de http retourne un Observable. Mais il est plus complexe à traiter qu&#39;une promise, alors on le convertit, pour que cela soit un peu plus simple à comprendre.</p>
+<h2 id="r-cup-rer-une-pizza-dans-notre-api">Récupérer une Pizza dans notre API</h2>
+<p>Nous avions écrit une méthode getPizza. Elle va chercher directement une correspondance avec un id dans un tableau de Pizza. C&#39;est bien, cela fonctionne mais ce n&#39;est pas très performant. Dans une vrai API, on aimerait faire des requêtes directement sur api/pizza/:id.</p>
+<p>On va modifier la méthode getPizza.</p>
+<pre><code class="lang-js">getPizza(id: number): Promise&lt;Pizza&gt; {
+  return this.http.get(&#39;api/pizzas/&#39; + id)
+            .toPromise()
+            .then(response =&gt; response.json().data as Pizza)
+}
+</code></pre>
+<p>C&#39;est presque la même chose que getPizzas sauf qu&#39;on récupére un objet Pizza plutôt qu&#39;un tableau d&#39;objet Pizza. Même en ayant modifié le service, les composants fonctionnent toujours car on est resté sur une promesse.</p>
+<h2 id="modifier-une-pizza">Modifier une Pizza</h2>
+<p>On aimerait maintenant pouvoir modifier une pizza. On va modifier notre PizzaComponent au niveau du template et on va lui ajouter une nouvelle méthode.</p>
+<pre><code class="lang-js">@Component({
+// ...
+  template: `
+    ...
+    &lt;button (click)=&quot;save()&quot;&gt;Modifier&lt;/button&gt;
+    ...
+  `
+})
+// ...
+export class PizzaComponent {
+// ...
+    save(): void {
+      this.pizzaService.update(this.pizza)
+          .then(() =&gt; this.goBack());
+    }
+// ...
+}
+</code></pre>
+<p>On va créer une fonction update dans notre pizzaService.</p>
+<pre><code class="lang-js">// ...
+update(pizza: Pizza): Promise&lt;Pizza&gt; {
+  return this.http.put(&#39;api/pizzas/&#39; + pizza.id, pizza)
+    .toPromise()
+    .then(() =&gt; pizza)
+}
+// ...
+</code></pre>
+<h2 id="et-pourquoi-pas-ajouter-une-pizza-">Et pourquoi pas ajouter une pizza ?</h2>
+<p>On pourrait également donner la possibilité à l&#39;utilisateur d&#39;ajouter une pizza. Rendons-nous dans notre PizzaComponent et ajoutons ce morceau d&#39;HTML dans le template ainsi que la méthode add dans la classe.</p>
+<pre><code class="lang-js">// ...
+template: `
+  &lt;h2&gt;Les pizzas&lt;/h2&gt;
+  &lt;ul class=&quot;pizzas&quot;&gt;
+    &lt;li *ngFor=&quot;let pizza of pizzas&quot;
+      [class.selected]=&quot;pizza === selectedPizza&quot;
+      (click)=&quot;onSelect(pizza)&quot;&gt;
+      &lt;span&gt;{{pizza.id}}: {{pizza.name}}&lt;/span&gt;
+      &lt;button (click)=&quot;delete(pizza); $event.stopPropagation()&quot;&gt;x&lt;/button&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;div&gt;
+    &lt;label&gt;Pizza:&lt;/label&gt; &lt;input #pizzaName /&gt;
+    &lt;button (click)=&quot;add(pizzaName.value); pizzaName.value=&#39;&#39;&quot;&gt;
+      Ajouter
+    &lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div *ngIf=&quot;selectedPizza&quot;&gt;
+    &lt;h2&gt;
+      {{selectedPizza.name | uppercase}}
+    &lt;/h2&gt;
+    &lt;button (click)=&quot;gotoPizza()&quot;&gt;Voir la pizza&lt;/button&gt;
+  &lt;/div&gt;
+`
+// ...
+add(name: string): void {
+  if (!name) return;
+  this.pizzaService.create(name)
+    .then(pizza =&gt; this.pizzas.push(pizza));
+}
+</code></pre>
+<p>Maintenant, on peut ajouter la méthode create dans le service.</p>
+<pre><code class="lang-js">create(name: string): Promise&lt;Pizza&gt; {
+  return this.http.post(&#39;api/pizzas&#39;, {name: name})
+            .toPromise()
+            .then(response =&gt; response.json().data as Pizza)
+}
+</code></pre>
+<p>Et voilà, maintenant, nous pouvons ajouter des pizzas.</p>
+<h2 id="supprimer-des-pizzas">Supprimer des pizzas</h2>
+<p>Il faudrait maintenant pouvoir ajouter un bouton de suppression pour chaque pizza. Comme pour la fonctionnalité d&#39;ajout, on va commencer par modifier notre composant Pizza. Vous remarquez le stopPropagation(), il permet de ne pas executer le onSelect du li quand on clique sur le bouton de suppression.</p>
+<pre><code class="lang-js">// ...
+template: `
+  ...
+  &lt;li *ngFor=&quot;let pizza of pizzas&quot;
+    [class.selected]=&quot;pizza === selectedPizza&quot;
+    (click)=&quot;onSelect(pizza)&quot;&gt;
+    &lt;span&gt;{{pizza.id}}: {{pizza.name}}&lt;/span&gt;
+    &lt;button (click)=&quot;delete(pizza); $event.stopPropagation()&quot;&gt;x&lt;/button&gt;
+  &lt;/li&gt;
+  ...
+`
+// ...
+delete(pizza: Pizza): void {
+  this.pizzaService.delete(pizza.id)
+    .then(() =&gt; {
+      this.pizzas = this.pizzas.filter(p =&gt; p !== pizza);
+    });
+}
+</code></pre>
+<p>Pour bien comprendre la méthode <a href="https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Array/filter" target="_blank">filter du prototype Array</a> en JavaScript.</p>
+<p>Et bien sûr, on va également créer la méthode delete dans notre service de Pizza.</p>
+<pre><code class="lang-js">delete(id: number): Promise&lt;void&gt; {
+  return this.http.delete(&#39;api/pizzas/&#39; + id)
+    .toPromise()
+    .then(() =&gt; null)
+}
+</code></pre>
+<p><a href="../angular2">Retour au sommaire Angular 2</a>.</p>
+</div></section><footer><div class="wrap">Copyright © 2018 Boxydev Inc.</div></footer><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script src="https://boxydev.github.io/WikiDoc/js/app.js"></script></body></html>

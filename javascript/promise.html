@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang="fr"><head><meta charSet="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta http-equiv="X-UA-Compatible" content="ie=edge"/><title>Promise - WikiDoc</title><link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/dracula.min.css"/><link rel="stylesheet" href="https://boxydev.github.io/WikiDoc/css/main.css"/></head><body><nav><div class="wrap"><a class="nav-home" href="https://boxydev.github.io/WikiDoc/index.html"><img class="nav-logo" src="https://www.boxydev.com/img/logo.png" alt="WikiDoc"/>  WikiDoc</a><div class="nav-list"><ul class="nav-left"><li><a class="" href="https://boxydev.github.io/WikiDoc/index.html">Accueil</a></li><li><a class="" href="https://boxydev.github.io/WikiDoc/about.html">A propos</a></li></ul><ul class="nav-right"><li><a target="_blank" href="https://github.com/Boxydev/WikiDoc">GitHub</a></li></ul></div></div></nav><section class="wrap page-content"><a class="edit-page-link" href="https://github.com/boxydev/WikiDoc/tree/master/src/data/pages/javascript/promise.md" target="_blank">Modifier sur GitHub</a><div><h1 id="l-objet-promise-en-javascript">L&#39;objet Promise en JavaScript</h1>
+<p>Depuis ES6, il est possible de créer des promesses en JavaScript (Promise). La promesse va nous permettre d&#39;éviter de faire un tas de callbacks imbriqués et réaliser des traitements asynchrones de manière simultanée.</p>
+<p>Exemple concret : On veut récupérer des utilisateurs sur notre API. On créer une fonction ajax qui permet de les récupérer mais comment retourner quelque chose quand la requête est terminée ?</p>
+<pre><code class="lang-js">var get = function (url) {
+    var xhr = new XMLHttpRequest()
+    xhr.open(&#39;GET&#39;, url)
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+            console.log(xhr.responseText)
+        }
+    }
+    xhr.send()
+}
+
+get(&#39;https://jsonplaceholder.typicode.com/users&#39;)
+</code></pre>
+<p>Une solution simple serait l&#39;utilisation d&#39;un callback.</p>
+<pre><code class="lang-js">var get = function (url, success) {
+    var xhr = new XMLHttpRequest()
+    xhr.open(&#39;GET&#39;, url)
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+            success(xhr.responseText)
+        }
+    }
+    xhr.send()
+}
+
+get(&#39;https://jsonplaceholder.typicode.com/users&#39;, function (data) {
+    console.log(data)
+})
+</code></pre>
+<p>Le problème est que si je veux enchainer les requêtes ajax, je me retrouve vite avec cela. C&#39;est vite illisible et difficilement maintenable.</p>
+<pre><code class="lang-js">get(&#39;https://jsonplaceholder.typicode.com/users&#39;, function (data) {
+    data = JSON.parse(data)
+    get(&#39;https://jsonplaceholder.typicode.com/posts?userId=&#39; + data[0].id, function (data) {
+        console.log(data)
+    })
+})
+</code></pre>
+<p>Avec la promesse, on va traiter le problème d&#39;une manière différente.</p>
+<pre><code class="lang-js">var get = function (url) {
+    return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest()
+        xhr.open(&#39;GET&#39;, url)
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                resolve(xhr.responseText)
+            }
+        }
+        xhr.send()
+    })
+}
+
+// La fonction get retourne maintenant une promesse.
+get(&#39;https://jsonplaceholder.typicode.com/users&#39;).then(function (data) {
+    console.log(data)
+})
+</code></pre>
+<p>On peut maintenant enchainer les appels Ajax sans problème.</p>
+<pre><code class="lang-js">get(&#39;https://jsonplaceholder.typicode.com/users&#39;).then(function (data) {
+    data = JSON.parse(data)
+    return get(&#39;https://jsonplaceholder.typicode.com/posts?userId=&#39; + data[0].id)
+}).then(function (data) {
+    console.log(data)
+})
+</code></pre>
+</div></section><footer><div class="wrap">Copyright © 2018 Boxydev Inc.</div></footer><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script src="https://boxydev.github.io/WikiDoc/js/app.js"></script></body></html>

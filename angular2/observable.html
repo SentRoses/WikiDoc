@@ -1,0 +1,55 @@
+<!DOCTYPE html><html lang="fr"><head><meta charSet="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta http-equiv="X-UA-Compatible" content="ie=edge"/><title>Angular 2 - Observable - WikiDoc</title><link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/dracula.min.css"/><link rel="stylesheet" href="https://boxydev.github.io/WikiDoc/css/main.css"/></head><body><nav><div class="wrap"><a class="nav-home" href="https://boxydev.github.io/WikiDoc/index.html"><img class="nav-logo" src="https://www.boxydev.com/img/logo.png" alt="WikiDoc"/>  WikiDoc</a><div class="nav-list"><ul class="nav-left"><li><a class="" href="https://boxydev.github.io/WikiDoc/index.html">Accueil</a></li><li><a class="" href="https://boxydev.github.io/WikiDoc/about.html">A propos</a></li></ul><ul class="nav-right"><li><a target="_blank" href="https://github.com/Boxydev/WikiDoc">GitHub</a></li></ul></div></div></nav><section class="wrap page-content"><a class="edit-page-link" href="https://github.com/boxydev/WikiDoc/tree/master/src/data/pages/angular2/observable.md" target="_blank">Modifier sur GitHub</a><div><h1 id="l-observable-dans-angular-2">L&#39;Observable dans Angular 2</h1>
+<p>L&#39;Observable peut être perçu comme l&#39;amélioration d&#39;une promesse en JavaScript. Il est très utilisé avec Angular 2. Pour mieux comprendre l&#39;Observable, prenons un exemple dans un composant simple.</p>
+<pre><code class="lang-js">import { Component } from &#39;@angular/core&#39;;
+
+@Component({
+  selector: &#39;my-app&#39;,
+  template: `
+    &lt;h1&gt;Observable avec Angular 2&lt;/h1&gt;
+  `
+})
+export class AppComponent {
+
+}
+</code></pre>
+<p>On va commencer par importer la classe Observable et Observer à partir de rxjs/Observable et rxjs/Observer. Ensuite, on crée une variable api qui sera de type Observable.</p>
+<pre><code class="lang-js">import { Component } from &#39;@angular/core&#39;;
+import { Observable } from &#39;rxjs/Observable&#39;;
+import { Observer } from &#39;rxjs/Observer&#39;;
+
+@Component({
+  selector: &#39;my-app&#39;,
+  template: `
+    &lt;h1&gt;Observable avec Angular 2&lt;/h1&gt;
+    &lt;div *ngFor=&quot;let data of datas&quot;&gt;
+      {{ data }}
+    &lt;/div&gt;
+  `
+})
+export class AppComponent {
+  private api: Observable&lt;Number&gt;;
+  private datas: Array&lt;Number&gt; = [];
+
+  constructor() {
+    this.api = new Observable((observer: Observer&lt;Number&gt;) =&gt; {
+      setTimeout(() =&gt; {
+        observer.next(1);
+      }, 1000);
+      setTimeout(() =&gt; {
+        observer.next(2);
+      }, 2000);
+      setTimeout(() =&gt; {
+        observer.next(3);
+      }, 3000);
+      setTimeout(() =&gt; {
+        observer.next(4);
+      }, 4000);
+    });
+
+    var subscription = this.api.subscribe((value: Number) =&gt; this.datas.push(value));
+  }
+}
+</code></pre>
+<p>Ici, on voit bien la variable api qui est un observable censé renvoyer des entiers. On initialise ensuite une variable datas qui est un tableau vide et qui sera censé contenir des entiers. Dans le constructeur, on initialise api qui est une instance d&#39;un observable et qui prend en paramètre un callback avec comme paramètre un observer. L&#39;observer va pouvoir renvoyer plusieurs données à la suite, on pourra par la suite souscrire à l&#39;api afin de récupérer ces données une à une si on le souhaite.</p>
+<p><a href="../angular2">Retour au sommaire Angular 2</a>.</p>
+</div></section><footer><div class="wrap">Copyright © 2018 Boxydev Inc.</div></footer><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script src="https://boxydev.github.io/WikiDoc/js/app.js"></script></body></html>

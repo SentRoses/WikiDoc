@@ -1,0 +1,341 @@
+<!DOCTYPE html><html lang="fr"><head><meta charSet="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta http-equiv="X-UA-Compatible" content="ie=edge"/><title>Angular 2 - Créer un système de route avec Angular 2 - WikiDoc</title><link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/dracula.min.css"/><link rel="stylesheet" href="https://boxydev.github.io/WikiDoc/css/main.css"/></head><body><nav><div class="wrap"><a class="nav-home" href="https://boxydev.github.io/WikiDoc/index.html"><img class="nav-logo" src="https://www.boxydev.com/img/logo.png" alt="WikiDoc"/>  WikiDoc</a><div class="nav-list"><ul class="nav-left"><li><a class="" href="https://boxydev.github.io/WikiDoc/index.html">Accueil</a></li><li><a class="" href="https://boxydev.github.io/WikiDoc/about.html">A propos</a></li></ul><ul class="nav-right"><li><a target="_blank" href="https://github.com/Boxydev/WikiDoc">GitHub</a></li></ul></div></div></nav><section class="wrap page-content"><a class="edit-page-link" href="https://github.com/boxydev/WikiDoc/tree/master/src/data/pages/angular2/creer-un-systeme-de-route-avec-angular-2.md" target="_blank">Modifier sur GitHub</a><div><h1 id="cr-er-un-syst-me-de-route-avec-angular-2">Créer un système de route avec Angular 2</h1>
+<p>On voit qu&#39;Angular 2 est un framework JavaScript très puissant. Mais on veut faire une application web ou un site web, et du coup, on a besoin de faire plusieurs pages HTML, comment fait-on ? Puisqu&#39;on part d&#39;un fichier index.html seul.</p>
+<p>Et bien, pas besoin de créer d&#39;autres fichiers HTML, Angular nous propose un module nous permettant de gérer nos routes. Une route = Un composant. Et notre composant principal AppComponent, va devenir le routeur qui redirige vers le bon composant.</p>
+<h2 id="s-parer-notre-appcomponent-dans-pizzascomponent">Séparer notre AppComponent dans PizzasComponent</h2>
+<p>Pour bien nous organiser, nous allons commencer par migrer en grande partie notre AppComponent dans PizzasComponent. Ce dernier sera responsable d&#39;afficher la liste de nos pizzas. Notre PizzasComponent doit ressembler à cela.</p>
+<pre><code class="lang-js">import { Component, OnInit } from &#39;@angular/core&#39;;
+import { Pizza } from &#39;./models/pizza.model&#39;;
+import { PizzaService } from &#39;./services/pizza.service&#39;;
+
+@Component({
+  selector: &#39;pizzas&#39;,
+  template: `
+    &lt;pizza [pizza]=&quot;selectedPizza&quot;&gt;&lt;/pizza&gt;
+    &lt;h2&gt;Les pizzas&lt;/h2&gt;
+    &lt;ul class=&quot;pizzas&quot;&gt;
+      &lt;li *ngFor=&quot;let pizza of pizzas&quot;
+        [class.selected]=&quot;pizza === selectedPizza&quot;
+        (click)=&quot;onSelect(pizza)&quot;&gt;
+        &lt;span&gt;{{pizza.id}}: {{pizza.name}}&lt;/span&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  `,
+  styles: [`
+    .pizzas li:hover {
+      cursor: pointer;
+    }
+  `],
+  providers: [PizzaService]
+})
+
+export class PizzasComponent implements OnInit {
+  pizzas: Pizza[];
+  selectedPizza: Pizza;
+
+  constructor(private pizzaService: PizzaService) { }
+
+  ngOnInit(): void {
+    this.pizzaService.getPizzas().then(pizzas =&gt; this.pizzas = pizzas);
+  }
+
+  onSelect(pizza: Pizza): void {
+    this.selectedPizza = pizza;
+  }
+}
+</code></pre>
+<p>Et voici notre nouveau AppComponent, beaucoup plus léger.</p>
+<pre><code class="lang-js">import { Component } from &#39;@angular/core&#39;;
+
+@Component({
+  selector: &#39;my-app&#39;,
+  template: `
+    &lt;h1&gt;{{title}}&lt;/h1&gt;
+    &lt;pizzas&gt;&lt;/pizzas&gt;
+  `
+})
+export class AppComponent {
+  title = &#39;Mon super site avec Angular 2&#39;;
+}
+</code></pre>
+<p>Bien entendu, on oublie pas de déclarer le nouveau composant dans le app.module.ts.</p>
+<pre><code class="lang-js">import { NgModule }      from &#39;@angular/core&#39;;
+import { BrowserModule } from &#39;@angular/platform-browser&#39;;
+import { FormsModule }   from &#39;@angular/forms&#39;;
+
+import { AppComponent }  from &#39;./app.component&#39;;
+import { PizzasComponent } from &#39;./pizzas.component&#39;;
+import { PizzaComponent } from &#39;./pizza.component&#39;;
+
+import { PizzaService } from &#39;./services/pizza.service&#39;;
+
+@NgModule({
+  imports: [
+    BrowserModule,
+    FormsModule
+  ],
+  declarations: [
+    AppComponent,
+    PizzasComponent,
+    PizzaComponent
+  ],
+  providers: [PizzaService],
+  bootstrap:    [ AppComponent ]
+})
+export class AppModule { }
+</code></pre>
+<h2 id="module-de-routes">Module de routes</h2>
+<p>On va maintenant pouvoir utiliser le module de routes d&#39;Angular 2, RouterModule. On va déjà s&#39;assurer d&#39;avoir <code>&lt;base href=&quot;/&quot;&gt;</code> dans le <code>&lt;head&gt;</code> de notre fichier html.</p>
+<p>On peut installer le module dans notre app.module.ts. On en profite pour créer une page /pizzas dans laquelle on chargera le composant PizzasComponent.</p>
+<pre><code class="lang-js">import { RouterModule } from &#39;@angular/router&#39;;
+
+@NgModule({
+  imports: [
+    // ...  
+    RouterModule.forRoot([
+      {
+        path: &#39;pizzas&#39;,
+        component: PizzasComponent
+      }
+    ])
+    // ...
+  ],
+  // ...
+})
+</code></pre>
+<p>Maintenant, on ajoute le <code>&lt;router-outlet&gt;&lt;/router-outlet&gt;</code> dans le AppComponent.</p>
+<pre><code class="lang-js">template: `
+  &lt;h1&gt;{{title}}&lt;/h1&gt;
+  &lt;a routerLink=&quot;/pizzas&quot;&gt;Pizzas&lt;/a&gt;
+  &lt;router-outlet&gt;&lt;/router-outlet&gt;
+`
+</code></pre>
+<h2 id="la-partie-front">La partie front</h2>
+<p>On va créer un nouveau composant qui affichera la liste de nos pizzas mais côté front pour l&#39;utilisateur. Pour le moment, notre PizzasComponent est plus adapté pour la gestion de nos pizzas. On va donc créer un FrontComponent.</p>
+<pre><code class="lang-js">import { Component } from &#39;@angular/core&#39;;
+@Component({
+  selector: &#39;front&#39;,
+  template: &#39;&lt;h2&gt;Home Page&lt;/h2&gt;&#39;
+})
+export class FrontComponent { }
+</code></pre>
+<p>On va ajouter le nouveau composant ainsi que la nouvelle route dans notre app.module.ts.</p>
+<pre><code class="lang-js">import { FrontComponent } from &#39;./front.component&#39;;
+// ...
+{
+  path: &#39;&#39;,
+  component: FrontComponent
+},
+// ...
+declarations: [
+  // ...
+  FrontComponent,
+  // ...
+],
+// ...
+</code></pre>
+<p>Et voici le template de notre AppComponent.</p>
+<pre><code class="lang-js">template: `
+  &lt;h1&gt;{{title}}&lt;/h1&gt;
+  &lt;nav&gt;
+    &lt;a routerLink=&quot;/&quot;&gt;Accueil&lt;/a&gt;
+    &lt;a routerLink=&quot;/pizzas&quot;&gt;Pizzas&lt;/a&gt;
+  &lt;/nav&gt;
+  &lt;router-outlet&gt;&lt;/router-outlet&gt;
+`
+</code></pre>
+<h2 id="afficher-les-pizzas-dans-la-partie-front">Afficher les pizzas dans la partie front</h2>
+<p>On veut maintenant récupérer les pizzas dans ce composant. Pour faire cela, on va utiliser notre service Pizza. On va implémenter la méthode ngOnInit.</p>
+<pre><code class="lang-js">import { Component, OnInit } from &#39;@angular/core&#39;;
+import { Pizza } from &#39;./models/pizza.model&#39;;
+import { PizzaService } from &#39;./services/pizza.service&#39;;
+// ...
+@Component({
+  // ...
+  template: `
+    &lt;h2&gt;Home Page&lt;/h2&gt;
+    &lt;div *ngFor=&quot;let pizza of pizzas&quot;&gt;
+      {{ pizza.name }}
+    &lt;/div&gt;
+  `
+})
+export class FrontComponent implements OnInit {
+  pizzas: Pizza[] = [];
+
+  constructor(private pizzaService: PizzaService) { }
+
+  ngOnInit(): void {
+    this.pizzaService.getPizzas()
+      .then(pizzas =&gt; this.pizzas = pizzas);
+  }
+}
+</code></pre>
+<h2 id="une-route-par-pizza">Une route par Pizza</h2>
+<p>Il pourrait être intéressant d&#39;avoir des routes dynamiques du genre /pizza/ID. On va commencer par définir la route dans le module.</p>
+<pre><code class="lang-js">{
+  path: &#39;pizza/:id&#39;,
+  component: PizzaComponent
+}
+</code></pre>
+<p>Maintenant, on va modifier notre PizzaComponent. On va utiliser notre service Pizza et pour éviter de le déclarer dans chaque composant en tant que provider, on peut le déclarer de manière globale dans le fichier app.module.ts.</p>
+<pre><code class="lang-js">import { Component, Input, OnInit } from &#39;@angular/core&#39;;
+import { Pizza } from &#39;./models/pizza.model&#39;;
+
+import { ActivatedRoute, Params }   from &#39;@angular/router&#39;;
+import { Location }                 from &#39;@angular/common&#39;;
+import { PizzaService } from &#39;./services/pizza.service&#39;;
+
+import &#39;rxjs/add/operator/switchMap&#39;;
+
+@Component({
+  selector: &#39;pizza&#39;,
+  template: `
+    &lt;div *ngIf=&quot;pizza&quot;&gt;
+      &lt;h2&gt;{{pizza.name}}&lt;/h2&gt;
+      &lt;div&gt;&lt;label&gt;id: &lt;/label&gt;{{pizza.id}}&lt;/div&gt;
+      &lt;div&gt;
+        &lt;label&gt;name: &lt;/label&gt;
+        &lt;input [(ngModel)]=&quot;pizza.name&quot; placeholder=&quot;name&quot;&gt;
+      &lt;/div&gt;
+      &lt;div&gt;&lt;label&gt;price: &lt;/label&gt;{{pizza.price}}&lt;/div&gt;
+    &lt;/div&gt;
+  `
+})
+export class PizzaComponent implements OnInit {
+  @Input() pizza: Pizza;
+
+  constructor(
+    private pizzaService: PizzaService,
+    private route: ActivatedRoute,
+    private location: Location
+  ) {}
+
+  ngOnInit(): void {
+    this.route.params
+      .switchMap((params: Params) =&gt; this.pizzaService.getPizza(+params[&#39;id&#39;]))
+      .subscribe(
+        pizza =&gt; this.pizza = pizza
+      );
+  }
+}
+</code></pre>
+<p>Prenons le temps de bien comprendre ce qu&#39;est une Promesse et un Observable. Bien sûr, on ajoute une méthode getPizza dans notre service.</p>
+<pre><code class="lang-js">getPizza(id: number): Promise&lt;Pizza&gt; {
+  return this.getPizzas()
+             .then(pizzas =&gt; pizzas.find(pizza =&gt; pizza.id === id))
+}
+</code></pre>
+<p>Ajoutons un lien dans le template du FrontComponent pour chaque pizza.</p>
+<pre><code class="lang-js">&lt;div *ngFor=&quot;let pizza of pizzas&quot;&gt;
+  &lt;a [routerLink]=&quot;[&#39;/pizza&#39;, pizza.id]&quot;&gt;{{pizza.name}}&lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
+<p>Maintenant, offrons la possibilité à l&#39;utilisateur de revenir en arrière quand il est sur une pizza.</p>
+<pre><code class="lang-js">// ...
+template: `
+  &lt;div *ngIf=&quot;pizza&quot;&gt;
+    &lt;h2&gt;{{pizza.name}}&lt;/h2&gt;
+    &lt;div&gt;&lt;label&gt;id: &lt;/label&gt;{{pizza.id}}&lt;/div&gt;
+    &lt;div&gt;
+      &lt;label&gt;name: &lt;/label&gt;
+      &lt;input [(ngModel)]=&quot;pizza.name&quot; placeholder=&quot;name&quot;&gt;
+    &lt;/div&gt;
+    &lt;div&gt;&lt;label&gt;price: &lt;/label&gt;{{pizza.price}}&lt;/div&gt;
+    &lt;button (click)=&quot;goBack()&quot;&gt;Retour&lt;/button&gt;
+  &lt;/div&gt;
+`
+// ...
+goBack(): void {
+  this.location.back();
+}
+</code></pre>
+<h2 id="refactorisons-nos-routes-dans-un-module-routing">Refactorisons nos routes dans un module Routing</h2>
+<p>Alors nous pouvons maintenant gérer nos routes très facilement. Le soucis est qu&#39;au bout d&#39;un certain temps, notre application va grandir et nous aurons de nombreuses routes. Nous allons donc créer un module spécifique aux routes. Créons un fichier app-routing.module.ts dans le dossier app/modules</p>
+<pre><code class="lang-js">import { NgModule } from &#39;@angular/core&#39;;
+import { RouterModule, Routes } from &#39;@angular/router&#39;;
+
+import { FrontComponent }  from &#39;../front.component&#39;;
+import { PizzasComponent } from &#39;../pizzas.component&#39;;
+import { PizzaComponent } from &#39;../pizza.component&#39;;
+
+const routes: Routes = [
+  { path: &#39;&#39;, component: FrontComponent },
+  { path: &#39;pizzas&#39;, component: PizzasComponent },
+  { path: &#39;pizza/:id&#39;, component: PizzaComponent }
+];
+
+@NgModule({
+  imports: [ RouterModule.forRoot(routes) ],
+  exports: [ RouterModule ]
+})
+export class AppRoutingModule {}
+</code></pre>
+<p>On peut maintenant adapter le fichier app.module.ts.</p>
+<pre><code class="lang-js">import { NgModule }      from &#39;@angular/core&#39;;
+import { BrowserModule } from &#39;@angular/platform-browser&#39;;
+import { FormsModule }   from &#39;@angular/forms&#39;;
+
+import { AppComponent }  from &#39;./app.component&#39;;
+import { FrontComponent }  from &#39;./front.component&#39;;
+import { PizzasComponent } from &#39;./pizzas.component&#39;;
+import { PizzaComponent } from &#39;./pizza.component&#39;;
+
+import { PizzaService } from &#39;./services/pizza.service&#39;;
+
+import { AppRoutingModule } from &#39;./modules/app-routing.module&#39;;
+
+@NgModule({
+  imports: [
+    BrowserModule,
+    FormsModule,
+    AppRoutingModule
+  ],
+  declarations: [
+    AppComponent,
+    FrontComponent,
+    PizzasComponent,
+    PizzaComponent
+  ],
+  providers: [PizzaService],
+  bootstrap:    [ AppComponent ]
+})
+export class AppModule { }
+</code></pre>
+<h2 id="notre-composant-pizza">Notre composant Pizza</h2>
+<p>Vous vous souvenez de l&#39;appel de notre composant Pizza dans Pizza, on va pouvoir le remplacer. En effet, le Pizza sert maintenant à afficher une pizza seul, pas une pizza selectionné sur le composant Pizza.</p>
+<p>Voici donc le nouveau template dans Pizza.</p>
+<pre><code class="lang-js">template: `
+  &lt;h2&gt;Les pizzas&lt;/h2&gt;
+  &lt;ul class=&quot;pizzas&quot;&gt;
+    &lt;li *ngFor=&quot;let pizza of pizzas&quot;
+      [class.selected]=&quot;pizza === selectedPizza&quot;
+      (click)=&quot;onSelect(pizza)&quot;&gt;
+      &lt;span&gt;{{pizza.id}}: {{pizza.name}}&lt;/span&gt;
+      &lt;button (click)=&quot;delete(pizza); $event.stopPropagation()&quot;&gt;x&lt;/button&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;div *ngIf=&quot;selectedPizza&quot;&gt;
+    &lt;h2&gt;
+      {{selectedPizza.name | uppercase}}
+    &lt;/h2&gt;
+    &lt;button (click)=&quot;gotoPizza()&quot;&gt;Voir la pizza&lt;/button&gt;
+  &lt;/div&gt;
+`,
+</code></pre>
+<p>Vous remarquez que nous avons ajouté un bouton qui va nous rediriger vers la page de la pizza selectionnée. On va implémenter cette méthode dans notre classe. Dans cette méthode, on va avoir besoin du service Router d&#39;Angular donc on va l&#39;importer.</p>
+<pre><code class="lang-js">// ...
+import { Router } from &#39;@angular/router&#39;;
+// ...
+export class PizzasComponent implements OnInit {
+// ...
+  constructor(
+    private router: Router,
+    private pizzaService: PizzaService) { }
+  // ...
+  gotoPizza(): void {
+    this.router.navigate([&#39;/pizza&#39;, this.selectedPizza.id]);
+  }
+// ...
+}
+</code></pre>
+<p><a href="../angular2">Retour au sommaire Angular 2</a>.</p>
+</div></section><footer><div class="wrap">Copyright © 2018 Boxydev Inc.</div></footer><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script src="https://boxydev.github.io/WikiDoc/js/app.js"></script></body></html>

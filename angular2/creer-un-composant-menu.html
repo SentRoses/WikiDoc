@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="fr"><head><meta charSet="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta http-equiv="X-UA-Compatible" content="ie=edge"/><title>Angular 2 - Créer un composant menu - WikiDoc</title><link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/dracula.min.css"/><link rel="stylesheet" href="https://boxydev.github.io/WikiDoc/css/main.css"/></head><body><nav><div class="wrap"><a class="nav-home" href="https://boxydev.github.io/WikiDoc/index.html"><img class="nav-logo" src="https://www.boxydev.com/img/logo.png" alt="WikiDoc"/>  WikiDoc</a><div class="nav-list"><ul class="nav-left"><li><a class="" href="https://boxydev.github.io/WikiDoc/index.html">Accueil</a></li><li><a class="" href="https://boxydev.github.io/WikiDoc/about.html">A propos</a></li></ul><ul class="nav-right"><li><a target="_blank" href="https://github.com/Boxydev/WikiDoc">GitHub</a></li></ul></div></div></nav><section class="wrap page-content"><a class="edit-page-link" href="https://github.com/boxydev/WikiDoc/tree/master/src/data/pages/angular2/creer-un-composant-menu.md" target="_blank">Modifier sur GitHub</a><div><h1 id="cr-er-un-composant-menu">Créer un composant menu</h1>
+<p>Essayez de créer un composant menu MenuComposent pour notre application de Pizza. Vous pouvez le créer à la main ou alors utiliser Angular CLI.</p>
+<pre><code class="lang-bash">ng generate component menu
+</code></pre>
+<p>Vous pouvez reprendre la navbar par défaut sur le site de Bootstrap. N&#39;hésitez pas à externaliser le template et le css.</p>
+<p>Maintenant, il va falloir inclure ce composant en tant qu&#39;enfant pour notre AppComponent. A vous de le faire.</p>
+<p>Vous pouvez également essayer de rendre le menu responsive. En effet, avec Angular, on évite l&#39;utilisation de jQuery et donc pas de plugin collapse du JS Bootstrap ! Il va falloir trouver un moyen d&#39;ajouter la classe in sur la div avec la classe collapse quand il y a un click sur le bouton.</p>
+<p>Il faut donc :</p>
+<ul>
+<li><p>ajouter un champ isCollapsed dans le composant, initialisé à false (le menu est fermé par défaut).</p>
+</li>
+<li><p>ajouter un écouteur de clic sur le bouton qui appelle une méthode toggleCollapseNavbar de notre composant</p>
+</li>
+<li><p>écrire cette méthode pour qu’elle mette à jour un champ du composant isCollapsed de vrai à faux, ou de faux à vrai.</p>
+</li>
+<li><p>la classe in devrait être ajoutée dynamiquement sur la div avec la classe collapse grâce à [class.in] ou à la directive ngClass dans le template.</p>
+</li>
+</ul>
+<p>Essayez ensuite d&#39;intégrer les routerLink directement dans notre menu en essayant de voir si vous pouvez gérer la page qui est active avec la classe active et le routerLinkActive.</p>
+<p><a href="../angular2">Retour au sommaire Angular 2</a>.</p>
+</div></section><footer><div class="wrap">Copyright © 2018 Boxydev Inc.</div></footer><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script src="https://boxydev.github.io/WikiDoc/js/app.js"></script></body></html>

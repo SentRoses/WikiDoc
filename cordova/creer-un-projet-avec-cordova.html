@@ -1,0 +1,19 @@
+<!DOCTYPE html><html lang="fr"><head><meta charSet="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta http-equiv="X-UA-Compatible" content="ie=edge"/><title>Cordova - Créer un projet avec Cordova - WikiDoc</title><link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/dracula.min.css"/><link rel="stylesheet" href="https://boxydev.github.io/WikiDoc/css/main.css"/></head><body><nav><div class="wrap"><a class="nav-home" href="https://boxydev.github.io/WikiDoc/index.html"><img class="nav-logo" src="https://www.boxydev.com/img/logo.png" alt="WikiDoc"/>  WikiDoc</a><div class="nav-list"><ul class="nav-left"><li><a class="" href="https://boxydev.github.io/WikiDoc/index.html">Accueil</a></li><li><a class="" href="https://boxydev.github.io/WikiDoc/about.html">A propos</a></li></ul><ul class="nav-right"><li><a target="_blank" href="https://github.com/Boxydev/WikiDoc">GitHub</a></li></ul></div></div></nav><section class="wrap page-content"><a class="edit-page-link" href="https://github.com/boxydev/WikiDoc/tree/master/src/data/pages/cordova/creer-un-projet-avec-cordova.md" target="_blank">Modifier sur GitHub</a><div><h1 id="cr-ation-d-un-projet-avec-cordova">Création d&#39;un projet avec Cordova</h1>
+<p>Nous allons maintenant créer notre premier projet avec Cordova. Attention, il ne faut pas avoir peur de la ligne de commande.
+La commande ci-dessous peut nous aider à comprendre la commande de création de projet intégré à la CLI.</p>
+<pre><code class="lang-bash">cordova help create
+</code></pre>
+<p>Pour le moment, l&#39;argument le plus important sera le path, autrement dit, le dossier de notre projet. On va se déplacer dans le dossier de nos projets.</p>
+<pre><code class="lang-bash">cd ~/MesProjets
+cordova create maPremiereAppCordova
+</code></pre>
+<p>Il est nécessaire de déclarer au moins une plateforme pour faire fonctionner l&#39;application. Une plateforme est simplement un périphérique sur lequel on veut faire fonctionner notre application. Dans un cas classique mobile, ce serait iOS ou Android. Mais cela peut également être une application Windows (Windows Store).
+Pour commencer au plus simple et au plus rapide, nous allons ajouter la plateforme Browser, qui concerne le navigateur web.</p>
+<pre><code class="lang-bash">cd maPremiereAppCordova
+cordova platform add browser
+</code></pre>
+<p>Une fois que la plateforme est ajoutée, on peut lancer l&#39;application.</p>
+<pre><code class="lang-bash">cordova run browser
+</code></pre>
+<p>Super ! Notre application fonctionne bien. Maintenant, comment faire pour choisir la plateforme Android ? Nous allons voir dans le <a href="la-plateforme-android.html">chapitre suivant</a>.</p>
+</div></section><footer><div class="wrap">Copyright © 2018 Boxydev Inc.</div></footer><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script src="https://boxydev.github.io/WikiDoc/js/app.js"></script></body></html>

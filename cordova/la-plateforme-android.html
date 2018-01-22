@@ -1,0 +1,25 @@
+<!DOCTYPE html><html lang="fr"><head><meta charSet="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta http-equiv="X-UA-Compatible" content="ie=edge"/><title>Cordova - La plateforme Android - WikiDoc</title><link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/dracula.min.css"/><link rel="stylesheet" href="https://boxydev.github.io/WikiDoc/css/main.css"/></head><body><nav><div class="wrap"><a class="nav-home" href="https://boxydev.github.io/WikiDoc/index.html"><img class="nav-logo" src="https://www.boxydev.com/img/logo.png" alt="WikiDoc"/>  WikiDoc</a><div class="nav-list"><ul class="nav-left"><li><a class="" href="https://boxydev.github.io/WikiDoc/index.html">Accueil</a></li><li><a class="" href="https://boxydev.github.io/WikiDoc/about.html">A propos</a></li></ul><ul class="nav-right"><li><a target="_blank" href="https://github.com/Boxydev/WikiDoc">GitHub</a></li></ul></div></div></nav><section class="wrap page-content"><a class="edit-page-link" href="https://github.com/boxydev/WikiDoc/tree/master/src/data/pages/cordova/la-plateforme-android.md" target="_blank">Modifier sur GitHub</a><div><h1 id="utiliser-android-avec-cordova">Utiliser Android avec Cordova</h1>
+<p>C&#39;est ici que les choses se compliquent. Comment tester notre application sur Android ? La première chose à savoir est que, pour chaque plateforme sur laquelle vous voulez compiler votre application, il vous faut le SDK concerné.</p>
+<p>Par exemple, pour <a href="https://cordova.apache.org/docs/en/7.x/guide/platforms/ios/index.html" target="_blank">compiler sous macOS</a>, il faut le SDK iOS, présent avec <a href="https://itunes.apple.com/us/app/xcode/id497799835?mt=12" target="_blank">XCode</a>.</p>
+<p>Pour <a href="https://cordova.apache.org/docs/en/7.x/guide/platforms/android/index.html" target="_blank">compiler sous Android</a>, c&#39;est plus complexe. Il nous faut <a href="https://developer.android.com/studio/index.html" target="_blank">Android Studio</a>, le SDK de la version Android concerné et aussi le <a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html" target="_blank">Java JDK</a>.</p>
+<p>Il faudra ensuite s&#39;occuper des variables d&#39;environnement. Il faut créer <code>JAVA_HOME</code> et <code>ANDROID_HOME</code>. Il faudrait également ajouter les dossiers <code>tools/</code> et <code>platform-tools</code> du SDK Android au <code>PATH</code>.</p>
+<p>Sous <strong>Linux</strong> :<br>On va modifier la variable PATH via le .bash_profile ou .zshrc</p>
+<pre><code class="lang-bash">export ANDROID_HOME=${HOME}/Android/Sdk
+export PATH=${PATH}:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/tools
+</code></pre>
+<p>Dans les dernières versions, Cordova utilise Grable pour le build des applications, il faut donc l&#39;ajouter dans le PATH également :</p>
+<pre><code class="lang-bash"># VERSION est à remplacer par 4.1 ou supérieur
+export PATH=${PATH}:/opt/android-studio/gradle/gradle-VERSION/bin
+</code></pre>
+<p>Maintenant, on peut retourner sur notre projet et ajouter la plateforme Android :</p>
+<pre><code class="lang-bash">cordova platform add android
+</code></pre>
+<p>On vérifie que tout est bien détecté par Cordova :</p>
+<pre><code class="lang-bash">cordova requirements android
+</code></pre>
+<p>On peut donc ouvrir le dossier <code>platforms/android</code> dans Android Studio et on clique sur &quot;Ok&quot; pour Gradle.
+Maintenant, on doit pouvoir lancer l&#39;application sur un émulateur et même sur un vrai téléphone Android.</p>
+<p>Cordova est donc parfaitement configuré sur notre machine. Nous allons pouvoir travailler sur notre nouvelle application. Nous aimerions utiliser Angular directement. Nous pourrions le faire fonctionner dans Cordova, mais cela demanderait beaucoup de travail inutile déjà effectué par <a href="https://ionicframework.com/">Ionic</a>...</p>
+<p>En effet, ce framework va nous simplifier la vie de développeur. On aura un rechargement en temps réel de l&#39;application, un émulateur plus poussé (iPhone et Android) directement dans le navigateur.<br>Il va nous fournir de nombreux composants nous permettant de construire une application mobile (Menu &quot;glissant&quot; sur le côté, Menu positionné en bas, effet de défilement style mobile, etc...) ainsi que des modules Angular nous permettant de contrôler directement le téléphone.</p>
+<p>Voyons <a href="../ionic">comment installer Ionic</a>.</p>
+</div></section><footer><div class="wrap">Copyright © 2018 Boxydev Inc.</div></footer><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script src="https://boxydev.github.io/WikiDoc/js/app.js"></script></body></html>

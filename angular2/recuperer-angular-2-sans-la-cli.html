@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="fr"><head><meta charSet="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta http-equiv="X-UA-Compatible" content="ie=edge"/><title>Angular 2 - Récupérer Angular 2 (Sans la CLI) - WikiDoc</title><link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/dracula.min.css"/><link rel="stylesheet" href="https://boxydev.github.io/WikiDoc/css/main.css"/></head><body><nav><div class="wrap"><a class="nav-home" href="https://boxydev.github.io/WikiDoc/index.html"><img class="nav-logo" src="https://www.boxydev.com/img/logo.png" alt="WikiDoc"/>  WikiDoc</a><div class="nav-list"><ul class="nav-left"><li><a class="" href="https://boxydev.github.io/WikiDoc/index.html">Accueil</a></li><li><a class="" href="https://boxydev.github.io/WikiDoc/about.html">A propos</a></li></ul><ul class="nav-right"><li><a target="_blank" href="https://github.com/Boxydev/WikiDoc">GitHub</a></li></ul></div></div></nav><section class="wrap page-content"><a class="edit-page-link" href="https://github.com/boxydev/WikiDoc/tree/master/src/data/pages/angular2/recuperer-angular-2-sans-la-cli.md" target="_blank">Modifier sur GitHub</a><div><h1 id="r-cup-rer-angular-2-sans-la-cli-">Récupérer Angular 2 (Sans la CLI)</h1>
+<p>On va récupérer le code de base d&#39;Angular 2 sans utiliser l&#39;interface en ligne de commande. Cela nous permettra de mieux comprendre comment fonctionne le framework. Cette version n&#39;est pas à utiliser en production mais uniquement à des fins de tests et de prototypage. <a href="https://github.com/angular/quickstart" target="_blank">Voici le github</a>.</p>
+<p>On clone le dépôt.</p>
+<pre><code class="lang-bash">git clone https://github.com/angular/quickstart ledossierdemonprojetangular2
+</code></pre>
+<p>On glisse dans le repertoire du projet.</p>
+<pre><code class="lang-bash">cd ledossierdemonprojetangular2
+</code></pre>
+<p>On supprime les fichiers inutiles.</p>
+<pre><code class="lang-bash">xargs rm -rf &lt; non-essential-files.osx.txt
+rm src/app/*.spec*.ts
+rm non-essential-files.osx.txt
+</code></pre>
+<p>Pour Windows.</p>
+<pre><code class="lang-bash">for /f %i in (non-essential-files.txt) do del %i /F /S /Q
+rd .git /s /q
+rd e2e /s /q
+</code></pre>
+<p>On doit donc se retrouver avec une architecture de ce genre.</p>
+<pre><code>├── bs-config.json
+├── package.json
+├── src
+│   ├── app
+│   │   ├── app.component.ts
+│   │   └── app.module.ts
+│   ├── favicon.ico
+│   ├── index.html
+│   ├── main.ts
+│   ├── styles.css
+│   ├── systemjs-angular-loader.js
+│   ├── systemjs.config.extras.js
+│   ├── systemjs.config.js
+│   └── tsconfig.json
+└── tslint.json
+</code></pre><p>Maintenant, on lance un coup de <code>npm install</code> pour les dépendances.</p>
+<pre><code class="lang-bash">npm install
+</code></pre>
+<p>On peut lancer le serveur de dev et on y accède via <a href="http://localhost:3000" target="_blank">http://localhost:3000</a>.</p>
+<pre><code class="lang-bash">npm start
+</code></pre>
+<p>La commande lance le transpileur en &quot;live&quot;. Quand le code est modifié, le transpileur recompile le code TypeScript en JavaScript et rafraichit le navigateur.</p>
+<p><a href="../angular2">Retour au sommaire Angular 2</a>.</p>
+</div></section><footer><div class="wrap">Copyright © 2018 Boxydev Inc.</div></footer><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script src="https://boxydev.github.io/WikiDoc/js/app.js"></script></body></html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="fr"><head><meta charSet="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta http-equiv="X-UA-Compatible" content="ie=edge"/><title>Angular 2 - Découpons notre application en plusieurs composants - WikiDoc</title><link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/dracula.min.css"/><link rel="stylesheet" href="https://boxydev.github.io/WikiDoc/css/main.css"/></head><body><nav><div class="wrap"><a class="nav-home" href="https://boxydev.github.io/WikiDoc/index.html"><img class="nav-logo" src="https://www.boxydev.com/img/logo.png" alt="WikiDoc"/>  WikiDoc</a><div class="nav-list"><ul class="nav-left"><li><a class="" href="https://boxydev.github.io/WikiDoc/index.html">Accueil</a></li><li><a class="" href="https://boxydev.github.io/WikiDoc/about.html">A propos</a></li></ul><ul class="nav-right"><li><a target="_blank" href="https://github.com/Boxydev/WikiDoc">GitHub</a></li></ul></div></div></nav><section class="wrap page-content"><a class="edit-page-link" href="https://github.com/boxydev/WikiDoc/tree/master/src/data/pages/angular2/decoupons-notre-application-en-plusieurs-composants.md" target="_blank">Modifier sur GitHub</a><div><h1 id="d-coupons-notre-application-en-plusieurs-composants">Découpons notre application en plusieurs composants</h1>
+<p>Pour le moment, c&#39;est notre classe AppComponent qui gère toute notre application. Par la suite, notre application va avoir de nombreuses fonctionnalités et sera difficilement maintenable. Le concept du framework Angular 2 est d&#39;en profiter pour découper notre application en plusieurs composants, qui seront chacuns responsable d&#39;une tache spécifique.</p>
+<p>D&#39;accord, allons-y, on va découper notre application.</p>
+<h2 id="cr-er-un-autre-composant">Créer un autre composant</h2>
+<p>Commencons par créer un composant qui sera responsable d&#39;afficher une pizza en particulier. Créons un fichier <code>pizza.component.ts</code> dans notre dossier <code>app/</code>. On appellera cette classe PizzaComponent.</p>
+<pre><code class="lang-js">import { Component } from &#39;@angular/core&#39;;
+
+@Component({
+  selector: &#39;pizza&#39;,
+})
+export class PizzaComponent {
+}
+</code></pre>
+<p>D&#39;ailleurs, on en profite pour refactoriser une partie du template de AppComponent dans notre nouveau composant et on peut créer aussi une propriété pizza.</p>
+<pre><code class="lang-js">import { Component } from &#39;@angular/core&#39;;
+
+@Component({
+  selector: &#39;pizza&#39;,
+  template: `
+    &lt;div *ngIf=&quot;pizza&quot;&gt;
+      &lt;h2&gt;{{pizza.name}}&lt;/h2&gt;
+      &lt;div&gt;&lt;label&gt;id: &lt;/label&gt;{{pizza.id}}&lt;/div&gt;
+      &lt;div&gt;
+        &lt;label&gt;name: &lt;/label&gt;
+        &lt;input [(ngModel)]=&quot;pizza.name&quot; placeholder=&quot;name&quot;&gt;
+      &lt;/div&gt;
+      &lt;div&gt;&lt;label&gt;price: &lt;/label&gt;{{pizza.price}}&lt;/div&gt;
+    &lt;/div&gt;
+  `
+})
+export class PizzaComponent {
+  pizza: Pizza;
+}
+</code></pre>
+<h2 id="une-classe-un-fichier">Une classe = un fichier</h2>
+<p>Soyons consciencieux et rangeons notre classe Pizza dans un dossier <code>app/models/pizza.model.ts</code>. D&#39;ailleurs, cette classe va devenir une interface (Attention, c&#39;est du TypeScript).</p>
+<pre><code class="lang-js">export interface Pizza {
+  id: number;
+  name: string;
+  price: number;
+}
+</code></pre>
+<p>N&#39;oublions pas d&#39;importer la classe Pizza dans nos 2 composants.</p>
+<pre><code class="lang-js">import { Pizza } from &#39;./models/pizza.model&#39;;
+</code></pre>
+<p>Ok Matthieu, mais comment je fais pour lier mes 2 composants maintenant ?</p>
+<p>En fait, PizzaComponent va devenir un enfant de AppComponent. On va pouvoir ajouter ce bout de code dans le template du AppComponent.</p>
+<pre><code class="lang-js">&lt;pizza [pizza]=&quot;selectedPizza&quot;&gt;&lt;/pizza&gt;
+</code></pre>
+<p>Vous remarquez l&#39;attribut pizza entre crochet ? C&#39;est ce qui va permettre d&#39;injecter la pizza dans le four... Euh pardon dans le composant PizzaComponent. Pour faire cela, on va devoir préciser que pizza est une propriété Input. On importe cette propriété à partir du noyau d&#39;Angular et on ajoute le décorateur sur la propriété pizza de <code>&lt;pizza&gt;&lt;/pizza&gt;</code>.</p>
+<pre><code class="lang-js">import { Component, Input } from &#39;@angular/core&#39;;
+// ...
+@Input() pizza: Pizza;
+</code></pre>
+<h2 id="d-claration-de-nouveaux-composants">Déclaration de nouveaux composants</h2>
+<p>La dernière étape pour que cela fonctionne est de déclarer ce nouveau composant dans le module de notre application.</p>
+<pre><code class="lang-js">import { NgModule }      from &#39;@angular/core&#39;;
+import { BrowserModule } from &#39;@angular/platform-browser&#39;;
+import { FormsModule }   from &#39;@angular/forms&#39;;
+
+import { AppComponent }  from &#39;./app.component&#39;;
+import { PizzaComponent } from &#39;./pizza.component&#39;;
+
+@NgModule({
+  imports: [
+    BrowserModule,
+    FormsModule
+  ],
+  declarations: [
+    AppComponent,
+    PizzaComponent
+  ],
+  bootstrap:    [ AppComponent ]
+})
+export class AppModule { }
+</code></pre>
+<p>Et voici le template final dans notre AppComponent.</p>
+<pre><code class="lang-js">template: `
+  &lt;h1&gt;{{title}}&lt;/h1&gt;
+  &lt;pizza [pizza]=&quot;selectedPizza&quot;&gt;&lt;/pizza&gt;
+  &lt;h2&gt;Les pizzas&lt;/h2&gt;
+  &lt;ul class=&quot;pizzas&quot;&gt;
+    &lt;li *ngFor=&quot;let pizza of pizzas&quot;
+      [class.selected]=&quot;pizza === selectedPizza&quot;
+      (click)=&quot;onSelect(pizza)&quot;&gt;
+      &lt;span&gt;{{pizza.id}}: {{pizza.name}}&lt;/span&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+  `,
+</code></pre>
+<p><a href="../angular2">Retour au sommaire Angular 2</a>.</p>
+</div></section><footer><div class="wrap">Copyright © 2018 Boxydev Inc.</div></footer><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script src="https://boxydev.github.io/WikiDoc/js/app.js"></script></body></html>

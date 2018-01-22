@@ -1,0 +1,87 @@
+<!DOCTYPE html><html lang="fr"><head><meta charSet="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta http-equiv="X-UA-Compatible" content="ie=edge"/><title>Angular 2 - Créer un service Angular 2 - WikiDoc</title><link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/dracula.min.css"/><link rel="stylesheet" href="https://boxydev.github.io/WikiDoc/css/main.css"/></head><body><nav><div class="wrap"><a class="nav-home" href="https://boxydev.github.io/WikiDoc/index.html"><img class="nav-logo" src="https://www.boxydev.com/img/logo.png" alt="WikiDoc"/>  WikiDoc</a><div class="nav-list"><ul class="nav-left"><li><a class="" href="https://boxydev.github.io/WikiDoc/index.html">Accueil</a></li><li><a class="" href="https://boxydev.github.io/WikiDoc/about.html">A propos</a></li></ul><ul class="nav-right"><li><a target="_blank" href="https://github.com/Boxydev/WikiDoc">GitHub</a></li></ul></div></div></nav><section class="wrap page-content"><a class="edit-page-link" href="https://github.com/boxydev/WikiDoc/tree/master/src/data/pages/angular2/creer-un-service-angular-2.md" target="_blank">Modifier sur GitHub</a><div><h1 id="cr-er-un-service-avec-angular-2">Créer un service avec Angular 2</h1>
+<p>Un service va nous permettre d&#39;écrire toute la logique qui concerne la récupération et le traitement d&#39;une certaine donnée. Dans notre cas, c&#39;est le service PizzaService qui va s&#39;occuper de nous donner le tableau de Pizza, ou alors récupérer les Pizzas sur une API par exemple.</p>
+<h2 id="service-pizza">Service Pizza</h2>
+<p>Commencons par créer notre fichier pizza.service.ts dans le dossier app/services.</p>
+<pre><code class="lang-js">import { Injectable } from &#39;@angular/core&#39;;
+
+@Injectable()
+export class PizzaService {
+  getPizzas(): void {}
+}
+</code></pre>
+<h2 id="mock-pizza">Mock Pizza</h2>
+<p>Vous avez remarquer que cette classe n&#39;est pas un composant pour Angular, mais un injectable. Cela signifie pour lui que cette classe pourra dépendre d&#39;une autre classe, comme par exemple la classe HTTP que l&#39;on verra bientôt afin de récupérer les données sur une API. La méthode getPizzas nous permettra de récupérer nos pizzas d&#39;une API ou d&#39;un fichier (d&#39;ailleurs nous allons créer pizza.mock.ts dans app/mocks).</p>
+<pre><code class="lang-js">import { Pizza } from &#39;../models/pizza.model&#39;;
+
+export const PIZZAS : Pizza[] = [
+  { id: 1, name: &#39;Reine&#39;, price: 12 },
+  { id: 2, name: &#39;4 fromages&#39;, price: 13 },
+  { id: 3, name: &#39;Orientale&#39;, price: 11 },
+  { id: 4, name: &#39;Cannibale&#39;, price: 9 }
+];
+</code></pre>
+<p>Dans notre app.component.ts, on va modifier la propriété pizzas.</p>
+<pre><code class="lang-js">pizzas: Pizza[];
+</code></pre>
+<h2 id="service-mock">Service + Mock</h2>
+<p>Voici notre service au final.</p>
+<pre><code class="lang-js">import { Injectable } from &#39;@angular/core&#39;;
+
+import { Pizza } from &#39;../models/pizza.model&#39;;
+import { PIZZAS } from &#39;../mocks/pizza.mock&#39;;
+
+@Injectable()
+export class PizzaService {
+  getPizzas(): Pizza[] {
+    return PIZZAS;
+  }
+}
+</code></pre>
+<p>On va maintenant devoir injecter ce nouveau service dans notre AppComponent. Pour faire cela, on commence par l&#39;importer et on va l&#39;injecter via le constructeur.</p>
+<pre><code class="lang-js">import { PizzaService } from &#39;./services/pizza.service&#39;;
+// ...
+export class AppComponent {
+  // ...
+  constructor(private pizzaService: PizzaService) { }
+  // ...
+}
+// ...
+</code></pre>
+<p>En voulant faire cela, on doit avoir une erreur dans la console &#39;ERROR Error: No provider for PizzaService!&#39;. Il va falloir ajouter PizzaService dans l&#39;attribut providers de notre composant App.</p>
+<pre><code class="lang-js">providers: [PizzaService]
+</code></pre>
+<h2 id="cycle-de-vie">Cycle de vie</h2>
+<p>Maintenant, il va falloir qu&#39;on remplisse la variable pizzas de AppComponent. La bonne question est quand est-ce que l&#39;on doit faire cela ? Et bien, il va falloir le faire au moment où le composant est initialisé. On pourrait être tenté de le faire dans le constructeur. Mais la bonne pratique est d&#39;utiliser le cycle de vie d&#39;une application Angular. Pour cela, on va pouvoir utiliser une méthode, ngOnInit. Notre composant va devoir implémenter l&#39;interface OnInit de cette manière (Ne récopiez pas ce code).</p>
+<pre><code class="lang-js">import { OnInit } from &#39;@angular/core&#39;;
+
+export class AppComponent implements OnInit {
+  ngOnInit(): void {
+  }
+}
+</code></pre>
+<p>La méthode ngOnInit s&#39;execute exactement quand le composant est initialisé, on va pouvoir ajouter notre tableau de pizzas à ce moment.</p>
+<pre><code class="lang-js">ngOnInit(): void {
+  this.pizzas = this.pizzaService.getPizzas();
+}
+</code></pre>
+<h2 id="promesse">Promesse</h2>
+<p>Pour l&#39;instant, notre service retourne un tableau de Pizzas défini en dur. Imaginons que ces pizzas proviennent d&#39;un web service ou d&#39;une API. Cette API sera sur un autre serveur et peut donc être amenée à être lente en fonction de plusieurs facteurs comme la connexion de l&#39;utilisateur. Imaginez ces données en train de charger et bloquant l&#39;affichage de l&#39;application... Pour éviter cela, on va charger ces données de manière asynchrone (toute notre application va charger jusqu&#39;au bout même si toutes les pizzas ne sont pas encore là). Pour cela, nous allons utiliser une promesse.</p>
+<pre><code class="lang-js">getPizzas(): Promise&lt;Pizza[]&gt; {
+  return Promise.resolve(PIZZAS);
+}
+</code></pre>
+<p>Dans notre AppComponent, on récupére maintenant une promesse et plus un tableau directement.</p>
+<pre><code class="lang-js">ngOnInit(): void {
+  this.pizzaService.getPizzas().then(pizzas =&gt; this.pizzas = pizzas);
+}
+</code></pre>
+<p>Attention, ici on utilise l&#39;ES6 (ou ES2015) pour pouvoir utiliser le this.</p>
+<p>Bon, pour le moment, c&#39;est facile, la promesse renvoie une réponse en 0 ms, ce qui n&#39;existe pas mis à part en local. On va créer une fonction en plus pour simuler une réponse plus lente d&#39;un serveur.</p>
+<pre><code class="lang-js">getPizzasSlowly(): Promise&lt;Pizza[]&gt; {
+  return new Promise(resolve =&gt; {
+    setTimeout(() =&gt; resolve(this.getPizzas()), 2000);
+  });
+}
+</code></pre>
+<p><a href="../angular2">Retour au sommaire Angular 2</a>.</p>
+</div></section><footer><div class="wrap">Copyright © 2018 Boxydev Inc.</div></footer><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script src="https://boxydev.github.io/WikiDoc/js/app.js"></script></body></html>
